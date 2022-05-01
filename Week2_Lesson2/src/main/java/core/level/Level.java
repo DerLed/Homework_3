@@ -1,45 +1,63 @@
 package core.level;
 
 import core.hero.*;
+import helper.Constant;
+import helper.Property;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 public enum Level {
-    L1(Map.of(
-            Archer.class, new Tuple(1, 1),
-            Warrior.class, new Tuple(1, 1),
-            Dwarf.class, new Tuple(1, 1),
-            Elf.class, new Tuple(1, 1),
-            Mage.class, new Tuple(1, 1))),
-    L2(Map.of(
-            Archer.class, new Tuple(1.2f, 1.3f),
-            Warrior.class, new Tuple(1.1f, 1.25f),
-            Dwarf.class, new Tuple(1, 1.4f),
-            Elf.class, new Tuple(1.3f, 1.05f),
-            Mage.class, new Tuple(1.1f, 1.1f))),
-    L3(Map.of(Archer.class, new Tuple(1.2f, 1.3f),
-            Warrior.class, new Tuple(1.7f, 1.65f),
-            Dwarf.class, new Tuple(1, 1.4f),
-            Elf.class, new Tuple(1.8f, 1.95f),
-            Mage.class, new Tuple(1.1f, 1.1f))),
-    L4(Map.of(Archer.class, new Tuple(1.2f, 1.3f),
-            Warrior.class, new Tuple(1.1f, 1.25f),
-            Dwarf.class, new Tuple(1, 1.4f),
-            Elf.class, new Tuple(2.3f, 1.05f),
-            Mage.class, new Tuple(1.1f, 2.1f))),
-    L5(Map.of(Archer.class, new Tuple(1.2f, 1.3f),
-            Warrior.class, new Tuple(1.1f, 1.25f),
-            Dwarf.class, new Tuple(2, 1.9f),
-            Elf.class, new Tuple(1.3f, 1.05f),
-            Mage.class, new Tuple(1.1f, 1.1f)));
+    L1(getHeroMapOnLevel(1)),
+    L2(getHeroMapOnLevel(2)),
+    L3(getHeroMapOnLevel(3)),
+    L4(getHeroMapOnLevel(4)),
+    L5(getHeroMapOnLevel(5));
 
-    private final Map<Class<? extends Hero>, Tuple> heroMap;
+    private final Map<String, Tuple> heroMap;
 
-    Level(Map<Class<? extends Hero>, Tuple> heroMap) {
+    Level(Map<String, Tuple> heroMap) {
         this.heroMap = heroMap;
     }
 
     public Tuple getTuple(Hero hero) {
-        return heroMap.get(hero.getClass());
+        return heroMap.get(hero.getClass().getSimpleName());
+    }
+
+    private static Map<String, Tuple> getHeroMapOnLevel(int level) {
+
+        Properties properties = Property.getProperty().getProperties();
+
+        Map<String, Tuple> heroMapOnLevel = new HashMap<>();
+
+        for (Object o : properties.keySet()) {
+
+            String nameHero = (String) o;
+
+            if (nameHero.startsWith(Constant.PREFIX_LEVEL_NAME.concat(Integer.toString(level)))) {
+                int index = nameHero.indexOf(Constant.HERO_NAME_SEPARATOR);
+                String[] heroParams = properties.getProperty(nameHero).split(Constant.HERO_PARAMETER_SEPARATOR);
+                float deltaHealth = Float.parseFloat(heroParams[0]);
+                float deltaDamage = Float.parseFloat(heroParams[1]);
+                heroMapOnLevel.put(nameHero.substring(++index), new Tuple(deltaHealth, deltaDamage));
+            }
+        }
+
+        return heroMapOnLevel;
     }
 }
+
+// делал еще такую реализацию не знаю какая лучше работает
+//этот комментарий оставил только в учебных целях,
+// в реальном коде конечно такие коментарии делать нельзя
+//
+//        for (String s : properties.stringPropertyNames()){
+//            if(s.startsWith("L".concat(Integer.toString(level)))){
+//                int index = s.indexOf(".");
+//                String[] heroParams = properties.getProperty(s).split(",");
+//                float deltaHealth = Float.parseFloat(heroParams[0]);
+//                float deltaDamage = Float.parseFloat(heroParams[1]);
+//                heroMapOnLevel.put(s.substring(++index), new Tuple(deltaHealth, deltaDamage));
+//            }
+//        }
