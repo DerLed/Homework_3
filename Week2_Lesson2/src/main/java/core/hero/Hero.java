@@ -20,10 +20,10 @@ public abstract class Hero {
 
     public void attack(Hero enemy) {
         if (isDeath()) {
-            System.out.println("Враг повержен, отдыхай");
+            System.out.println("Враг повержен, отдыхай\n");
             return;
         }
-        System.out.printf("<%s атакует %s> ",
+        System.out.printf("<%s атакует %s> %n",
                 this.getClass().getSimpleName(),
                 enemy.getClass().getSimpleName());
         attack();
@@ -39,7 +39,7 @@ public abstract class Hero {
     private void damage(Hero enemy) {
         int protectSum = enemy.protects
                 .stream()
-                .peek(i -> System.out.printf("<Применена защита: %s, сохранено здоровья: %d> ",
+                .peek(i -> System.out.printf("<Применена защита: %s, сохранено здоровья: %d> %n",
                         i.getClass().getSimpleName(), i.protect()))
                 .mapToInt(Protectable::protect)
                 .sum();
@@ -67,7 +67,7 @@ public abstract class Hero {
         Tuple tuple = level.getTuple(this);
         float newDamage = this.damage * tuple.getDeltaDamage();
         float newHealth = this.health * tuple.getDeltaHealth();
-        System.out.printf("<У персонажа %s теперь уровень %d, было %f хп, стало %f хп> ",
+        System.out.printf("<У персонажа %s теперь уровень %d, было %f хп, стало %f хп> %n",
                 this.getClass().getSimpleName(),
                 level.ordinal() + 1,
                 health,
